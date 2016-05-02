@@ -20,6 +20,10 @@ x86/
 bld/
 [Bb]in/
 [Oo]bj/
+target/
+
+# Rust
+Cargo.lock
 
 # Visual Studio 2015 cache/options directory
 .vs/
