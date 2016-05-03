@@ -19,6 +19,9 @@
 use std::{ptr, str};
 use toml::{Value, Array, Table};
 
+// -----------------------------------------------------------------------------------------------
+// Creation functions
+
 #[no_mangle]
 pub extern "C" fn toml_free_value(value: *mut Value) {
     if !value.is_null() {
@@ -62,5 +65,137 @@ pub extern "C" fn toml_new_array() -> *mut Value {
 #[no_mangle]
 pub extern "C" fn toml_new_table() -> *mut Value {
     Box::into_raw(Box::new(Value::Table(Table::new())))
+}
+
+// -----------------------------------------------------------------------------------------------
+// Getter functions
+
+#[no_mangle]
+pub extern "C" fn toml_get_string(value: *const Value, data: *mut &[u8]) -> bool {
+    match *unsafe { &*value } {
+        Value::String(ref s) => {
+            unsafe { *data = &*(s.as_bytes() as *const [u8]) };
+            true
+        }
+        _ => false
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_get_i64(value: *const Value, data: *mut i64) -> bool {
+    match *unsafe { &*value } {
+        Value::Integer(i) => {
+            unsafe { *data = i };
+            true
+        }
+        _ => false
+    }
+ }
+
+#[no_mangle]
+pub extern "C" fn toml_get_f64(value: *const Value, data: *mut f64) -> bool {
+    match *unsafe { &*value } {
+        Value::Float(f) => {
+            unsafe { *data = f };
+            true
+        }
+        _ => false
+    }
+ }
+
+#[no_mangle]
+pub extern "C" fn toml_get_datetime(value: *const Value, data: *mut &[u8]) -> bool {
+    match *unsafe { &*value } {
+        Value::Datetime(ref s) => {
+            unsafe { *data = &*(s.as_bytes() as *const [u8]) };
+            true
+        }
+        _ => false
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_get_array(value: *const Value, data: *mut *const Array) -> bool {
+    match *unsafe { &*value } {
+        Value::Array(ref a) => {
+            unsafe { *data = a };
+            true
+        }
+        _ => false
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_get_array_mut(value: *mut Value, data: *mut *mut Array) -> bool {
+    match *unsafe { &mut *value } {
+        Value::Array(ref mut a) => {
+            unsafe { *data = a };
+            true
+        }
+        _ => false
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_get_table(value: *const Value, data: *mut *const Table) -> bool {
+    match *unsafe { &*value } {
+        Value::Table(ref t) => {
+            unsafe { *data = t };
+            true
+        }
+        _ => false
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_get_table_mut(value: *mut Value, data: *mut *mut Table) -> bool {
+    match *unsafe { &mut *value } {
+        Value::Table(ref mut t) => {
+            unsafe { *data = t };
+            true
+        }
+        _ => false
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_set_string(value: *mut Value, data: &[u8]) -> bool {
+    let data = match str::from_utf8(data) {
+        Ok(s) => s,
+        Err(_) => return false,
+    };
+    
+    let value = unsafe { &mut *value };
+    if let Value::String(ref mut s) = *value {
+        s.clear();
+        s.push_str(data);
+    } else {
+        *value = Value::String(data.into());
+    }
+    
+    true
+}
+
+#[no_mangle]
+pub extern "C" fn toml_set_i64(value: *mut Value, data: i64) {
+    *value = Value::Integer(data);
+}
+
+#[no_mangle]
+pub extern "C" fn toml_set_datetime(value: *mut Value, data: &[u8]) -> bool {
+    let data = match str::from_utf8(data) {
+        Ok(s) => s,
+        Err(_) => return false,
+    };
+    
+    let value = unsafe { &mut *value };
+    if let Value::Datetime(ref mut s) = *value {
+        s.clear();
+        s.push_str(data);
+    } else {
+        *value = Value::Datetime(data.into());
+    }
+    
+    true
 }
 

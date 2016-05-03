@@ -48,31 +48,31 @@ namespace TOML
         
         /// Get a slice containing the UTF-8 data of the string.
         /// Returns false if the value is not a string.
-        extern "C" bool toml_get_string(const Value *value, Rust::Slice<const char> *data);
+        extern "C" bool DLL_IMPORT toml_get_string(const Value *value, Rust::Slice<const char> *data);
         /// Get the 64-bit integer stored in the value
         /// Returns false if the value is not an i64.
-        extern "C" bool toml_get_i64(const Value *value, i64 *data);
+        extern "C" bool DLL_IMPORT toml_get_i64(const Value *value, i64 *data);
         /// Get the 64-bit float stored in the value.
         /// Returns false if the value is not an f64.
-        extern "C" bool toml_get_f64(const Value *value, f64 *data);
+        extern "C" bool DLL_IMPORT toml_get_f64(const Value *value, f64 *data);
         /// Get a slice containing the UTF-8 data of the datetime.
         /// Returns false if the value is not a datetime.
-        extern "C" bool toml_get_datetime(const Value *value, Rust::Slice<const char> *data);
+        extern "C" bool DLL_IMPORT toml_get_datetime(const Value *value, Rust::Slice<const char> *data);
         /// Get an immutable view of the array contained in this value.
         /// Returns false if the value is not an array.
-        extern "C" bool toml_get_array(const Value *value, const Array **data);
+        extern "C" bool DLL_IMPORT toml_get_array(const Value *value, const Array **data);
         /// Get a mutable view of the array contained in this value.
         /// Returns false if the value is not an array.
-        extern "C" bool toml_get_array_mut(Value *value, Array **data);
+        extern "C" bool DLL_IMPORT toml_get_array_mut(Value *value, Array **data);
         /// Get an immutable view of the table contained in this value.
         /// Returns false if the value is not a table.
-        extern "C" bool toml_get_table(const Value *value, const Table **data);
+        extern "C" bool DLL_IMPORT toml_get_table(const Value *value, const Table **data);
         /// Get a mutable view of the table contained in this value.
         /// Returns false if the value is not a table.
-        extern "C" bool toml_get_table_mut(Value *value, Table **data);
+        extern "C" bool DLL_IMPORT toml_get_table_mut(Value *value, Table **data);
         
         /// Sets the value to be a String containing the data.
         /// Returns false and makes no changes to the value if the data is not valid UTF-8.
-        extern "C" bool toml_set_string(Value *value, Rust::Slice<const char> data);
+        extern "C" bool DLL_IMPORT toml_set_string(Value *value, Rust::Slice<const char> data);
     }
 }
