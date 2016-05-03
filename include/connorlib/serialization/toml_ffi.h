@@ -44,6 +44,8 @@ namespace FFI
     extern "C" Value * DLL_IMPORT toml_new_array();
     /// Create a new Value containing a table, you have ownership of the returned value.
     extern "C" Value * DLL_IMPORT toml_new_table();
+    /// Make a copy of a value so you can insert it into another structure
+    extern "C" Value * DLL_IMPORT toml_clone(const Value *value);
     
     /// Get a slice containing the UTF-8 data of the string.
     /// Returns false if the value is not a string.
@@ -86,5 +88,40 @@ namespace FFI
     extern "C" void DLL_IMPORT toml_set_array(Value *value);
     /// Sets the value to be an empty table
     extern "C" void DLL_IMPORT toml_set_table(Value *value);
+    
+    extern "C" void  DLL_IMPORT toml_array_clear(Array *array);
+    extern "C" usize DLL_IMPORT toml_array_len(const Array *array);
+    extern "C" bool  DLL_IMPORT toml_array_get(const Array *array, usize idx, const Value **value);
+    extern "C" bool  DLL_IMPORT toml_array_get_mut(Array *array, usize idx, Value **value);
+    extern "C" void  DLL_IMPORT toml_array_push(Array *array, Value *value);
+    extern "C" bool  DLL_IMPORT toml_array_pop(Array *array);
+    extern "C" bool  DLL_IMPORT toml_array_insert(Array *array, usize idx, Value *value);
+    extern "C" bool  DLL_IMPORT toml_array_remove(Array *array, usize idx);
+    
+    extern "C" void  DLL_IMPORT toml_table_clear(Table *table);
+    extern "C" usize DLL_IMPORT toml_table_len(const Table *table);
+    extern "C" bool  DLL_IMPORT toml_table_keys(
+        const Table *table,
+        Rust::Slice<Rust::Slice<const char>> key_list
+    );
+    extern "C" bool  DLL_IMPORT toml_table_get(
+        const Table *table,
+        Rust::Slice<const char> key,
+        const Value **value
+    );
+    extern "C" bool  DLL_IMPORT toml_table_get_mut(
+        Table *table,
+        Rust::Slice<const char> key,
+        Value **value
+    );
+    extern "C" bool  DLL_IMPORT toml_table_insert(
+        Table *table,
+        Rust::Slice<const char> key,
+        Value *value
+    );
+    extern "C" bool  DLL_IMPORT toml_table_remove(
+        Table *table,
+        Rust::Slice<const char> key
+    );
 }
 }

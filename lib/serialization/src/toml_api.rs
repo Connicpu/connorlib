@@ -67,6 +67,11 @@ pub extern "C" fn toml_new_table() -> *mut Value {
     Box::into_raw(Box::new(Value::Table(Table::new())))
 }
 
+#[no_mangle]
+pub extern "C" fn toml_clone(value: *const Value) -> *mut Value {
+    Box::into_raw(Box::new(unsafe { (*value).clone() }))
+}
+
 // -----------------------------------------------------------------------------------------------
 // Getter functions
 
@@ -217,5 +222,80 @@ pub extern "C" fn toml_set_array(value: *mut Value) {
 #[no_mangle]
 pub extern "C" fn toml_set_table(value: *mut Value) {
     unsafe { *value = Value::Table(Table::new()) };
+}
+
+// -----------------------------------------------------------------------------------------------
+// Array functions
+
+#[no_mangle]
+pub extern "C" fn toml_array_clear(array: *mut Array) {
+    unsafe { (*array).clear() };
+}
+
+#[no_mangle]
+pub extern "C" fn toml_array_len(array: *const Array) -> usize {
+    unsafe { (*array).len() }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_array_get(
+    array: *const Array, idx: usize, value: *mut *const Value
+) -> bool {
+    if let Some(val) = unsafe { (*array).get(idx) } {
+        unsafe { *value = val as *const Value };
+        true
+    } else {
+        false
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_array_get_mut(
+    array: *mut Array, idx: usize, value: *mut *mut Value
+) -> bool {
+    if let Some(val) = unsafe { (*array).get_mut(idx) } {
+        unsafe { *value = val as *mut Value };
+        true
+    } else {
+        false
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_array_push(array: *mut Array, value: *mut Value) {
+    unsafe {
+        let value = Box::from_raw(value);
+        (*array).push(*value);
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_array_pop(array: *mut Array) -> bool {
+    unsafe { (*array).pop().is_some() }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_array_insert(array: *mut Array, idx: usize, value: *mut Value) -> bool {
+    unsafe {
+        if idx > (*array).len() {
+            return false;
+        }
+        
+        let value = Box::from_raw(value);
+        (*array).insert(idx, *value);
+        true
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_array_remove(array: *mut Array, idx: usize) -> bool {
+    unsafe {
+        if idx >= (*array).len() {
+            return false;
+        }
+        
+        (*array).remove(idx);
+        true
+    }
 }
 
