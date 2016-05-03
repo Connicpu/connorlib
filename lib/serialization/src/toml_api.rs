@@ -299,3 +299,92 @@ pub extern "C" fn toml_array_remove(array: *mut Array, idx: usize) -> bool {
     }
 }
 
+// -----------------------------------------------------------------------------------------------
+// Table functions
+
+#[no_mangle]
+pub extern "C" fn toml_table_clear(table: *mut Table) {
+    unsafe { (*table).clear() }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_table_len(table: *const Table) -> usize {
+    unsafe { (*table).len() }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_table_keys(table: *const Table, key_list: &mut [&str]) -> bool {
+    let table = unsafe { &*table };
+    
+    if key_list.len() != table.len() {
+        return false;
+    }
+    
+    for (src, dst) in table.keys().zip(key_list.iter_mut()) {
+        *dst = src;
+    }
+    
+    true
+}
+
+
+#[no_mangle]
+pub extern "C" fn toml_table_get(
+    table: *const Table, key: &[u8], value: *mut *const Value
+) -> bool {
+    let table = unsafe { &*table };
+    let key = match str::from_utf8(key) {
+        Ok(key) => key,
+        Err(_) => return false,
+    };
+    
+    if let Some(val) = table.get(key) {
+        unsafe { *value = val as *const Value };
+        true 
+    } else {
+        false
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_table_get_mut(
+    table: *mut Table, key: &[u8], value: *mut *mut Value
+) -> bool {
+    let table = unsafe { &mut *table };
+    let key = match str::from_utf8(key) {
+        Ok(key) => key,
+        Err(_) => return false,
+    };
+    
+    if let Some(val) = table.get_mut(key) {
+        unsafe { *value = val as *mut Value };
+        true 
+    } else {
+        false
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_table_insert(table: *mut Table, key: &[u8], value: *mut Value) -> bool {
+    let table = unsafe { &mut *table };
+    let key = match str::from_utf8(key) {
+        Ok(key) => key,
+        Err(_) => return false,
+    };
+    
+    let value = unsafe { Box::from_raw(value) };
+    table.insert(key.into(), *value);
+    true
+}
+
+#[no_mangle]
+pub extern "C" fn toml_table_remove(table: *mut Table, key: &[u8]) -> bool {
+    let table = unsafe { &mut *table };
+    let key = match str::from_utf8(key) {
+        Ok(key) => key,
+        Err(_) => return false,
+    };
+    
+    table.remove(key).is_some()
+}
+

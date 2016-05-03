@@ -89,36 +89,52 @@ namespace FFI
     /// Sets the value to be an empty table
     extern "C" void DLL_IMPORT toml_set_table(Value *value);
     
+    /// Removes all items from an array
     extern "C" void  DLL_IMPORT toml_array_clear(Array *array);
+    /// Gets the number of items in an array
     extern "C" usize DLL_IMPORT toml_array_len(const Array *array);
+    /// Get the value at the given index in the array
     extern "C" bool  DLL_IMPORT toml_array_get(const Array *array, usize idx, const Value **value);
+    /// Get a mutable reference to the value at the given index in the array
     extern "C" bool  DLL_IMPORT toml_array_get_mut(Array *array, usize idx, Value **value);
+    /// Push a value onto the end of the array
     extern "C" void  DLL_IMPORT toml_array_push(Array *array, Value *value);
+    /// Pop the value at the end of the array
     extern "C" bool  DLL_IMPORT toml_array_pop(Array *array);
+    /// Insert a value at the specified index in the array
     extern "C" bool  DLL_IMPORT toml_array_insert(Array *array, usize idx, Value *value);
+    /// Remove the value at the specified index in the array
     extern "C" bool  DLL_IMPORT toml_array_remove(Array *array, usize idx);
     
+    /// Remove all items from the table
     extern "C" void  DLL_IMPORT toml_table_clear(Table *table);
+    /// Get the number of key-value pairs in the table
     extern "C" usize DLL_IMPORT toml_table_len(const Table *table);
+    /// Get a list of all of the keys in the table. key_list should
+    /// point to an array with room for all of the keys in the table.
     extern "C" bool  DLL_IMPORT toml_table_keys(
         const Table *table,
         Rust::Slice<Rust::Slice<const char>> key_list
     );
+    /// Get the value with the specified key from the table
     extern "C" bool  DLL_IMPORT toml_table_get(
         const Table *table,
         Rust::Slice<const char> key,
         const Value **value
     );
+    /// Get a mutable value with the specified key from the table
     extern "C" bool  DLL_IMPORT toml_table_get_mut(
         Table *table,
         Rust::Slice<const char> key,
         Value **value
     );
+    /// Insert a value into the table with the specified key
     extern "C" bool  DLL_IMPORT toml_table_insert(
         Table *table,
         Rust::Slice<const char> key,
         Value *value
     );
+    /// Remove the value in the table with the specified key
     extern "C" bool  DLL_IMPORT toml_table_remove(
         Table *table,
         Rust::Slice<const char> key
