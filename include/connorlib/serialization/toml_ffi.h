@@ -18,7 +18,6 @@
 
 #include <connorlib/dll.h>
 #include <connorlib/rustop.h>
-#include <stdint.h>
 
 namespace TOML
 {
