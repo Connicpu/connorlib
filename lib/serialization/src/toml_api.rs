@@ -178,7 +178,12 @@ pub extern "C" fn toml_set_string(value: *mut Value, data: &[u8]) -> bool {
 
 #[no_mangle]
 pub extern "C" fn toml_set_i64(value: *mut Value, data: i64) {
-    *value = Value::Integer(data);
+    unsafe { *value = Value::Integer(data) };
+}
+
+#[no_mangle]
+pub extern "C" fn toml_set_f64(value: *mut Value, data: f64) {
+    unsafe { *value = Value::Float(data) };
 }
 
 #[no_mangle]
