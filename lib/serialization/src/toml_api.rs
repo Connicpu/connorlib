@@ -204,3 +204,18 @@ pub extern "C" fn toml_set_datetime(value: *mut Value, data: &[u8]) -> bool {
     true
 }
 
+#[no_mangle]
+pub extern "C" fn toml_set_bool(value: *mut Value, data: bool) {
+    unsafe { *value = Value::Boolean(data) };
+}
+
+#[no_mangle]
+pub extern "C" fn toml_set_array(value: *mut Value) {
+    unsafe { *value = Value::Array(Array::new()) };
+}
+
+#[no_mangle]
+pub extern "C" fn toml_set_table(value: *mut Value) {
+    unsafe { *value = Value::Table(Table::new()) };
+}
+
