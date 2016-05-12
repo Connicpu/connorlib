@@ -17,7 +17,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::{ptr, str};
-use std::str::FromStr;
 use toml::{self, Value, Array, Table};
 
 // -----------------------------------------------------------------------------------------------
@@ -96,7 +95,7 @@ pub extern "C" fn toml_get_i64(value: *const Value, data: *mut i64) -> bool {
         }
         _ => false
     }
- }
+}
 
 #[no_mangle]
 pub extern "C" fn toml_get_f64(value: *const Value, data: *mut f64) -> bool {
@@ -107,13 +106,24 @@ pub extern "C" fn toml_get_f64(value: *const Value, data: *mut f64) -> bool {
         }
         _ => false
     }
- }
+}
 
 #[no_mangle]
 pub extern "C" fn toml_get_datetime(value: *const Value, data: *mut &[u8]) -> bool {
     match *unsafe { &*value } {
         Value::Datetime(ref s) => {
             unsafe { *data = &*(s.as_bytes() as *const [u8]) };
+            true
+        }
+        _ => false
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_get_bool(value: *const Value, data: *mut bool) -> bool {
+    match *unsafe { &*value } {
+        Value::Boolean(b) => {
+            unsafe { *data = b };
             true
         }
         _ => false
@@ -331,7 +341,7 @@ pub extern "C" fn toml_table_keys(table: *const Table, key_list: &mut [&str]) ->
 
 #[no_mangle]
 pub extern "C" fn toml_table_get(
-    table: *const Table, key: &[u8], value: *mut *const Value
+    table: *const Table, key: &&[u8], value: *mut *const Value
 ) -> bool {
     let table = unsafe { &*table };
     let key = match str::from_utf8(key) {
@@ -349,7 +359,7 @@ pub extern "C" fn toml_table_get(
 
 #[no_mangle]
 pub extern "C" fn toml_table_get_mut(
-    table: *mut Table, key: &[u8], value: *mut *mut Value
+    table: *mut Table, key: &&[u8], value: *mut *mut Value
 ) -> bool {
     let table = unsafe { &mut *table };
     let key = match str::from_utf8(key) {
@@ -366,7 +376,7 @@ pub extern "C" fn toml_table_get_mut(
 }
 
 #[no_mangle]
-pub extern "C" fn toml_table_insert(table: *mut Table, key: &[u8], value: *mut Value) -> bool {
+pub extern "C" fn toml_table_insert(table: *mut Table, key: &&[u8], value: *mut Value) -> bool {
     let table = unsafe { &mut *table };
     let key = match str::from_utf8(key) {
         Ok(key) => key,
@@ -379,7 +389,7 @@ pub extern "C" fn toml_table_insert(table: *mut Table, key: &[u8], value: *mut V
 }
 
 #[no_mangle]
-pub extern "C" fn toml_table_remove(table: *mut Table, key: &[u8]) -> bool {
+pub extern "C" fn toml_table_remove(table: *mut Table, key: &&[u8]) -> bool {
     let table = unsafe { &mut *table };
     let key = match str::from_utf8(key) {
         Ok(key) => key,
@@ -393,19 +403,24 @@ pub extern "C" fn toml_table_remove(table: *mut Table, key: &[u8]) -> bool {
 // Serialization functions
 
 #[no_mangle]
-pub extern "C" fn toml_parse_text(data: &[u8], output: *mut *mut Value) -> bool {
+pub extern "C" fn toml_parse_text(data: &&[u8], output: *mut *mut Value) -> bool {
     let data = match str::from_utf8(data) {
         Ok(data) => data,
-        Err(_) => return false,
+        Err(_) => {
+            let data = Box::new(Value::String("Invalid UTF-8 data".into()));
+            unsafe { *output = Box::into_raw(data) };
+            return false
+        },
     };
     
-    let result = FromStr::from_str(data);
-    match result {
-        Ok(data) => {
-            unsafe { *output = Box::into_raw(Box::new(data)) };
+    let mut parser = toml::Parser::new(data);
+    match parser.parse() {
+        Some(data) => {
+            unsafe { *output = Box::into_raw(Box::new(Value::Table(data))) };
             true
         }
-        Err(err) => {
+        None => {
+            let err = &parser.errors[..];
             let data = Box::new(Value::String(format!("{:?}", err)));
             unsafe { *output = Box::into_raw(data) };
             false

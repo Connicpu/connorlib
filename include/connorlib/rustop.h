@@ -18,6 +18,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <string>
 
 using i8 = std::int8_t;
 using u8 = std::uint8_t;
@@ -30,6 +31,8 @@ using u64 = std::uint64_t;
 using usize = size_t;
 using f32 = float;
 using f64 = double;
+
+#define RUST_STR(x) (Rust::Slice<const char>{ "" x, sizeof("" x)-1 })
 
 namespace Rust
 {
@@ -49,7 +52,7 @@ namespace Rust
             assert(data != nullptr || len == 0);
         }
         
-        explicit inline Slice(const string_type &str)
+        inline Slice(const string_type &str)
             : data(str.c_str()), len(str.size())
         {
         }
