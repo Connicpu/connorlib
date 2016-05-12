@@ -139,5 +139,15 @@ namespace FFI
         Table *table,
         Rust::Slice<const char> key
     );
+    
+    extern "C" bool DLL_IMPORT toml_parse_text(
+        Rust::Slice<const char> data,
+        Value **output
+    );
+    
+    extern "C" void DLL_IMPORT toml_serialize_text(
+        const Value *data,
+        Value **output
+    );
 }
 }

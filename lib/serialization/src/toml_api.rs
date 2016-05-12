@@ -17,7 +17,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::{ptr, str};
-use toml::{Value, Array, Table};
+use std::str::FromStr;
+use toml::{self, Value, Array, Table};
 
 // -----------------------------------------------------------------------------------------------
 // Creation functions
@@ -388,3 +389,37 @@ pub extern "C" fn toml_table_remove(table: *mut Table, key: &[u8]) -> bool {
     table.remove(key).is_some()
 }
 
+// -----------------------------------------------------------------------------------------------
+// Serialization functions
+
+#[no_mangle]
+pub extern "C" fn toml_parse_text(data: &[u8], output: *mut *mut Value) -> bool {
+    let data = match str::from_utf8(data) {
+        Ok(data) => data,
+        Err(_) => return false,
+    };
+    
+    let result = FromStr::from_str(data);
+    match result {
+        Ok(data) => {
+            unsafe { *output = Box::into_raw(Box::new(data)) };
+            true
+        }
+        Err(err) => {
+            let data = Box::new(Value::String(format!("{:?}", err)));
+            unsafe { *output = Box::into_raw(data) };
+            false
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_serialize_text(data: &Value, output: *mut *mut Value) -> bool {
+    if !data.as_table().is_some() {
+        return false;
+    }
+    
+    let result = toml::encode_str(data);
+    unsafe { *output = Box::into_raw(Box::new(Value::String(result))) };
+    true
+}
