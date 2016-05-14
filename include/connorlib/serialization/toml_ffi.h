@@ -63,91 +63,91 @@ namespace FFI
     
     /// Get an immutable view of the array contained in this value.
     /// Returns false if the value is not an array.
-    extern "C" DLL_IMPORT bool  toml_get_array(const Value *value, const Array **data);
+    extern "C" DLL_IMPORT bool toml_get_array(const Value *value, const Array **data);
     /// Get a mutable view of the array contained in this value.
     /// Returns false if the value is not an array.
-    extern "C" DLL_IMPORT bool  toml_get_array_mut(Value *value, Array **data);
+    extern "C" DLL_IMPORT bool toml_get_array_mut(Value *value, Array **data);
     /// Get an immutable view of the table contained in this value.
     /// Returns false if the value is not a table.
-    extern "C" DLL_IMPORT bool  toml_get_table(const Value *value, const Table **data);
+    extern "C" DLL_IMPORT bool toml_get_table(const Value *value, const Table **data);
     /// Get a mutable view of the table contained in this value.
     /// Returns false if the value is not a table.
-    extern "C" DLL_IMPORT bool  toml_get_table_mut(Value *value, Table **data);
+    extern "C" DLL_IMPORT bool toml_get_table_mut(Value *value, Table **data);
     
     /// Sets the value to be a String containing the data.
     /// Returns false and makes no changes to the value if the data is not valid UTF-8.
-    extern "C" DLL_IMPORT bool  toml_set_string(Value *value, Rust::Slice<const char> data);
+    extern "C" DLL_IMPORT bool toml_set_string(Value *value, Rust::Slice<const char> data);
     /// Sets the value to be an i64 of the given value
-    extern "C" DLL_IMPORT void  toml_set_i64(Value *value, i64 data);
+    extern "C" DLL_IMPORT void toml_set_i64(Value *value, i64 data);
     /// Sets the value to be an f64 of the given value
-    extern "C" DLL_IMPORT void  toml_set_f64(Value *value, f64 data);
+    extern "C" DLL_IMPORT void toml_set_f64(Value *value, f64 data);
     /// Sets the value to be a Datetime containing the data.
     /// Returns false and makes no changes to the value if the data is not valid UTF-8.
-    extern "C" DLL_IMPORT bool  toml_set_datetime(Value *value, Rust::Slice<const char> data);
+    extern "C" DLL_IMPORT bool toml_set_datetime(Value *value, Rust::Slice<const char> data);
     /// Sets the value to be a boolean with the given value
-    extern "C" DLL_IMPORT void  toml_set_bool(Value *value, bool data);
+    extern "C" DLL_IMPORT void toml_set_bool(Value *value, bool data);
     /// Sets the value to be an empty array
-    extern "C" DLL_IMPORT void  toml_set_array(Value *value);
+    extern "C" DLL_IMPORT void toml_set_array(Value *value);
     /// Sets the value to be an empty table
-    extern "C" DLL_IMPORT void  toml_set_table(Value *value);
+    extern "C" DLL_IMPORT void toml_set_table(Value *value);
     
     /// Removes all items from an array
-    extern "C" DLL_IMPORT void   toml_array_clear(Array *array);
+    extern "C" DLL_IMPORT void  toml_array_clear(Array *array);
     /// Gets the number of items in an array
-    extern "C" DLL_IMPORT usize  toml_array_len(const Array *array);
+    extern "C" DLL_IMPORT usize toml_array_len(const Array *array);
     /// Get the value at the given index in the array
-    extern "C" DLL_IMPORT bool   toml_array_get(const Array *array, usize idx, const Value **value);
+    extern "C" DLL_IMPORT bool  toml_array_get(const Array *array, usize idx, const Value **value);
     /// Get a mutable reference to the value at the given index in the array
-    extern "C" DLL_IMPORT bool   toml_array_get_mut(Array *array, usize idx, Value **value);
+    extern "C" DLL_IMPORT bool  toml_array_get_mut(Array *array, usize idx, Value **value);
     /// Push a value onto the end of the array
-    extern "C" DLL_IMPORT void   toml_array_push(Array *array, Value *value);
+    extern "C" DLL_IMPORT void  toml_array_push(Array *array, Value *value);
     /// Pop the value at the end of the array
-    extern "C" DLL_IMPORT bool   toml_array_pop(Array *array);
+    extern "C" DLL_IMPORT bool  toml_array_pop(Array *array);
     /// Insert a value at the specified index in the array
-    extern "C" DLL_IMPORT bool   toml_array_insert(Array *array, usize idx, Value *value);
+    extern "C" DLL_IMPORT bool  toml_array_insert(Array *array, usize idx, Value *value);
     /// Remove the value at the specified index in the array
-    extern "C" DLL_IMPORT bool   toml_array_remove(Array *array, usize idx);
+    extern "C" DLL_IMPORT bool  toml_array_remove(Array *array, usize idx);
     
     /// Remove all items from the table
-    extern "C" DLL_IMPORT void   toml_table_clear(Table *table);
+    extern "C" DLL_IMPORT void  toml_table_clear(Table *table);
     /// Get the number of key-value pairs in the table
-    extern "C" DLL_IMPORT usize  toml_table_len(const Table *table);
+    extern "C" DLL_IMPORT usize toml_table_len(const Table *table);
     /// Get a list of all of the keys in the table. key_list should
     /// point to an array with room for all of the keys in the table.
-    extern "C" DLL_IMPORT bool   toml_table_keys(
+    extern "C" DLL_IMPORT bool  toml_table_keys(
         const Table *table,
         Rust::Slice<Rust::Slice<const char>> key_list
     );
     /// Get the value with the specified key from the table
-    extern "C" DLL_IMPORT bool   toml_table_get(
+    extern "C" DLL_IMPORT bool toml_table_get(
         const Table *table,
         const Rust::Slice<const char> &key,
         const Value **value
     );
     /// Get a mutable value with the specified key from the table
-    extern "C" DLL_IMPORT bool   toml_table_get_mut(
+    extern "C" DLL_IMPORT bool toml_table_get_mut(
         Table *table,
         const Rust::Slice<const char> &key,
         Value **value
     );
     /// Insert a value into the table with the specified key
-    extern "C" DLL_IMPORT bool   toml_table_insert(
+    extern "C" DLL_IMPORT bool toml_table_insert(
         Table *table,
         const Rust::Slice<const char> &key,
         Value *value
     );
     /// Remove the value in the table with the specified key
-    extern "C" DLL_IMPORT bool   toml_table_remove(
+    extern "C" DLL_IMPORT bool toml_table_remove(
         Table *table,
         const Rust::Slice<const char> &key
     );
     
-    extern "C" DLL_IMPORT bool  toml_parse_text(
+    extern "C" DLL_IMPORT bool toml_parse_text(
         const Rust::Slice<const char> &data,
         Value **output
     );
     
-    extern "C" DLL_IMPORT void  toml_serialize_text(
+    extern "C" DLL_IMPORT void toml_serialize_text(
         const Value *data,
         Value **output
     );

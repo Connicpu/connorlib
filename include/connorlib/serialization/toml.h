@@ -66,6 +66,16 @@ namespace TOML
             std::swap(value, move.value);
         }
 
+        const ValueRef *operator->() const
+        {
+            return Ref();
+        }
+
+        ValueRef *operator->()
+        {
+            return Ref();
+        }
+
         bool Valid() const
         {
             return !!value;
@@ -74,6 +84,11 @@ namespace TOML
         const ValueRef *Ref() const
         {
             return (const ValueRef *)value;
+        }
+
+        ValueRef *Ref()
+        {
+            return (ValueRef *)value;
         }
 
         static Value Parse(const std::string &str)
@@ -150,6 +165,19 @@ namespace TOML
             if (!FFI::toml_get_table(ptr(), &table))
                 return nullptr;
             return (const Table *)table;
+        }
+
+        std::string Serialize() const
+        {
+            if (!IsTable())
+                throw TomlError(RUST_STR("Can't serialize non-tables"));
+            FFI::Value *output;
+            FFI::toml_serialize_text(ptr(), &output);
+            Rust::Slice<const char> text;
+            FFI::toml_get_string(output, &text);
+            std::string text_str = text;
+            FFI::toml_free_value(output);
+            return std::move(text_str);
         }
     };
 
