@@ -17,5 +17,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 extern crate toml;
+extern crate rustc_serialize;
 
+pub mod conversion_api;
 pub mod toml_api;

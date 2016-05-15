@@ -8,4 +8,5 @@ crate-type = ["dylib"]
 
 [dependencies]
 toml = "0.1"
+rustc-serialize = "0.3.19"
 
