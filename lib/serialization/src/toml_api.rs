@@ -30,8 +30,8 @@ pub extern "C" fn toml_free_value(value: *mut Value) {
 }
 
 #[no_mangle]
-pub extern "C" fn toml_new_string(data: &[u8]) -> *mut Value {
-    if let Ok(s) = str::from_utf8(data) {
+pub extern "C" fn toml_new_string(data: &&[u8]) -> *mut Value {
+    if let Ok(s) = str::from_utf8(*data) {
         Box::into_raw(Box::new(Value::String(s.into())))
     } else {
         ptr::null_mut()
@@ -49,8 +49,8 @@ pub extern "C" fn toml_new_f64(data: f64) -> *mut Value {
 }
 
 #[no_mangle]
-pub extern "C" fn toml_new_datetime(data: &[u8]) -> *mut Value {
-    if let Ok(s) = str::from_utf8(data) {
+pub extern "C" fn toml_new_datetime(data: &&[u8]) -> *mut Value {
+    if let Ok(s) = str::from_utf8(*data) {
         Box::into_raw(Box::new(Value::Datetime(s.into())))
     } else {
         ptr::null_mut()

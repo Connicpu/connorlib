@@ -32,14 +32,14 @@ namespace FFI
     
     /// Create a new Value containing a string, you have ownership of the returned value.
     /// This function will fail and return nullptr if the data is not valid UTF-8.
-    extern "C" DLL_IMPORT Value * toml_new_string(Rust::Slice<const char> data);
+    extern "C" DLL_IMPORT Value * toml_new_string(const Rust::Slice<const char> &data);
     /// Create a new Value containing an i64, you have ownership of the returned value.
     extern "C" DLL_IMPORT Value * toml_new_i64(int64_t data);
     /// Create a new Value containing an f64, you have ownership of the returned value.
     extern "C" DLL_IMPORT Value * toml_new_f64(double data);
     /// Create a new Value containing a datetime, you have ownership of the returned value.
     /// This function will fail and return nullptr if the data is not valid UTF-8.
-    extern "C" DLL_IMPORT Value * toml_new_datetime(Rust::Slice<const char> data);
+    extern "C" DLL_IMPORT Value * toml_new_datetime(const Rust::Slice<const char> &data);
     /// Create a new Value containing an array, you have ownership of the returned value.
     extern "C" DLL_IMPORT Value * toml_new_array();
     /// Create a new Value containing a table, you have ownership of the returned value.
