@@ -76,14 +76,14 @@ namespace FFI
     
     /// Sets the value to be a String containing the data.
     /// Returns false and makes no changes to the value if the data is not valid UTF-8.
-    extern "C" DLL_IMPORT bool toml_set_string(Value *value, Rust::Slice<const char> data);
+    extern "C" DLL_IMPORT bool toml_set_string(Value *value, const Rust::Slice<const char> &data);
     /// Sets the value to be an i64 of the given value
     extern "C" DLL_IMPORT void toml_set_i64(Value *value, i64 data);
     /// Sets the value to be an f64 of the given value
     extern "C" DLL_IMPORT void toml_set_f64(Value *value, f64 data);
     /// Sets the value to be a Datetime containing the data.
     /// Returns false and makes no changes to the value if the data is not valid UTF-8.
-    extern "C" DLL_IMPORT bool toml_set_datetime(Value *value, Rust::Slice<const char> data);
+    extern "C" DLL_IMPORT bool toml_set_datetime(Value *value, const Rust::Slice<const char> &data);
     /// Sets the value to be a boolean with the given value
     extern "C" DLL_IMPORT void toml_set_bool(Value *value, bool data);
     /// Sets the value to be an empty array

@@ -175,8 +175,8 @@ pub extern "C" fn toml_get_table_mut(value: *mut Value, data: *mut *mut Table) -
 }
 
 #[no_mangle]
-pub extern "C" fn toml_set_string(value: *mut Value, data: &[u8]) -> bool {
-    let data = match str::from_utf8(data) {
+pub extern "C" fn toml_set_string(value: *mut Value, data: &&[u8]) -> bool {
+    let data = match str::from_utf8(*data) {
         Ok(s) => s,
         Err(_) => return false,
     };
@@ -203,8 +203,8 @@ pub extern "C" fn toml_set_f64(value: *mut Value, data: f64) {
 }
 
 #[no_mangle]
-pub extern "C" fn toml_set_datetime(value: *mut Value, data: &[u8]) -> bool {
-    let data = match str::from_utf8(data) {
+pub extern "C" fn toml_set_datetime(value: *mut Value, data: &&[u8]) -> bool {
+    let data = match str::from_utf8(*data) {
         Ok(s) => s,
         Err(_) => return false,
     };
