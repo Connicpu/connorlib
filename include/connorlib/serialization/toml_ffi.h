@@ -116,7 +116,7 @@ namespace FFI
     /// point to an array with room for all of the keys in the table.
     extern "C" DLL_IMPORT bool  toml_table_keys(
         const Table *table,
-        Rust::Slice<Rust::Slice<const char>> key_list
+        const Rust::Slice<Rust::Slice<const char>> &key_list
     );
     /// Get the value with the specified key from the table
     extern "C" DLL_IMPORT bool toml_table_get(

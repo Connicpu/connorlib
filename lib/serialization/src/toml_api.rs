@@ -324,7 +324,7 @@ pub extern "C" fn toml_table_len(table: *const Table) -> usize {
 }
 
 #[no_mangle]
-pub extern "C" fn toml_table_keys(table: *const Table, key_list: &mut [&str]) -> bool {
+pub extern "C" fn toml_table_keys(table: *const Table, key_list: &mut &mut [&str]) -> bool {
     let table = unsafe { &*table };
     
     if key_list.len() != table.len() {
