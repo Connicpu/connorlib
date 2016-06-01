@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ConnorLib
 {
-    public class InRustStr
+    internal class InRustStr
     {
         private InRustStr()
         {
@@ -36,24 +33,24 @@ namespace ConnorLib
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct Data
+        internal struct Data
         {
-            public Data(IntPtr d, UIntPtr l)
+            internal Data(IntPtr d, UIntPtr l)
             {
                 data = d;
                 len = l;
             }
 
-            public IntPtr data;
-            public UIntPtr len;
+            internal IntPtr data;
+            internal UIntPtr len;
         }
 
         private IntPtr ary;
-        public Data data;
+        internal Data data;
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct OutRustStr
+    internal struct OutRustStr
     {
         public static implicit operator string(OutRustStr s)
         {
@@ -68,16 +65,16 @@ namespace ConnorLib
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public class GetRustStrList
+    internal class GetRustStrList
     {
-        public GetRustStrList(int c)
+        internal GetRustStrList(int c)
         {
             count = c;
             ary = Marshal.AllocHGlobal(count * Marshal.SizeOf<OutRustStr>());
             data = new Data(ary, (UIntPtr)count);
         }
 
-        public string[] GetStrings()
+        internal string[] GetStrings()
         {
             var strings = new string[count];
             for (int i = 0; i < count; ++i)
@@ -98,9 +95,9 @@ namespace ConnorLib
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct Data
+        internal struct Data
         {
-            public Data(IntPtr d, UIntPtr l)
+            internal Data(IntPtr d, UIntPtr l)
             {
                 data = d;
                 len = l;
@@ -112,6 +109,6 @@ namespace ConnorLib
 
         private IntPtr ary;
         private int count;
-        public Data data;
+        internal Data data;
     }
 }
