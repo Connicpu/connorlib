@@ -1,0 +1,10 @@
+[package]
+name = "imageload"
+version = "0.1.0"
+authors = ["Connor Hilarides <connorcpu@live.com>"]
+
+[lib]
+crate-type = ["dylib"]
+
+[dependencies]
+image = "0.10"

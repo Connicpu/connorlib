@@ -16,6 +16,8 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#pragma once
+
 #include <connorlib/dll.h>
 #include <connorlib/serialization/toml_ffi.h>
 #include <connorlib/serialization/json_ffi.h>
@@ -27,7 +29,7 @@ namespace FFI
     using Toml = TOML::FFI::Value;
     using Json = JSON::FFI::Value;
     
-    extern "C" DLL_IMPORT void toml_to_json(const Toml *input, Json **output);
-    extern "C" DLL_IMPORT void json_to_toml(const Json *input, Toml **output);
+    extern "C" TOML_DLL_IMPORT void toml_to_json(const Toml *input, Json **output);
+    extern "C" TOML_DLL_IMPORT void json_to_toml(const Json *input, Toml **output);
 }
 }
