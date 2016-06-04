@@ -28,7 +28,7 @@ namespace ImageLoad
     class MultiImage;
     class Frame;
     
-    using buf_free_t = void(*)(void *buf, size_t len);
+    using buf_free_t = void(*)(const uint8_t *buf, size_t len);
     
     extern "C" IMG_DLL_IMPORT void image_free_id(ImageId *id);
     extern "C" IMG_DLL_IMPORT void image_free(Image *img);
@@ -45,17 +45,24 @@ namespace ImageLoad
     // The ImageId will take ownership of your buffer and free it with `free` upon closing
     extern "C" IMG_DLL_IMPORT ImageId * image_open_buffer_owned(const uint8_t *buf, size_t len, buf_free_t free);
     
+    // IMPORTANT NOTE: load_multi functions consume the ImageId, the regular ones do not.
+    // If you pass an ImageId to one of these functions, you are no longer responsible
+    // for freeing the value.
+    
     extern "C" IMG_DLL_IMPORT Image * image_load_png(const ImageId *id);
     extern "C" IMG_DLL_IMPORT Image * image_load_jpg(const ImageId *id);
     extern "C" IMG_DLL_IMPORT Image * image_load_gif(const ImageId *id);
     extern "C" IMG_DLL_IMPORT Image * image_load_webp(const ImageId *id);
-    extern "C" IMG_DLL_IMPORT MultiImage * image_load_multi_gif(const ImageId *id, bool stream);
-    extern "C" IMG_DLL_IMPORT MultiImage * image_load_multi_webp(const ImageId *id, bool stream);
+    extern "C" IMG_DLL_IMPORT Image * image_load_ppm(const ImageId *id);
+    extern "C" IMG_DLL_IMPORT Image * image_load_bmp(const ImageId *id);
+    extern "C" IMG_DLL_IMPORT Image * image_load_ico(const ImageId *id);
+    extern "C" IMG_DLL_IMPORT MultiImage * image_load_multi_gif(ImageId *id);
     
-    extern "C" IMG_DLL_IMPORT Frame * image_get_frame(const Image *image);
-    extern "C" IMG_DLL_IMPORT Frame * image_get_frame_multi(const Image *image, uint32_t index);
+    extern "C" IMG_DLL_IMPORT const Frame * image_get_frame(const Image *image);
+    extern "C" IMG_DLL_IMPORT const Frame * image_get_frame_multi(MultiImage *image, uint32_t index, uint16_t *delay);
+    extern "C" IMG_DLL_IMPORT void image_get_size(const Image *image, uint32_t *width, uint32_t *height);
+    extern "C" IMG_DLL_IMPORT void image_get_multi_size(const MultiImage *image, uint32_t *width, uint32_t *height);
     
-    extern "C" IMG_DLL_IMPORT void image_get_frame_size(const Frame *frame, uint32_t *width, uint32_t *height);
     // Always gives Rgba8 pixels. Size of *buffer is 4*width*height.
     extern "C" IMG_DLL_IMPORT void image_get_frame_buffer(const Frame *frame, const uint8_t **buffer);
 }
