@@ -44,6 +44,11 @@ pub extern "C" fn toml_new_i64(data: i64) -> *mut Value {
 }
 
 #[no_mangle]
+pub extern "C" fn toml_new_bool(data: bool) -> *mut Value {
+    Box::into_raw(Box::new(Value::Boolean(data)))
+}
+
+#[no_mangle]
 pub extern "C" fn toml_new_f64(data: f64) -> *mut Value {
     Box::into_raw(Box::new(Value::Float(data)))
 }

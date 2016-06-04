@@ -39,6 +39,7 @@ namespace FFI
     extern "C" TOML_DLL_IMPORT Value * toml_new_i64(int64_t data);
     /// Create a new Value containing an f64, you have ownership of the returned value.
     extern "C" TOML_DLL_IMPORT Value * toml_new_f64(double data);
+    extern "C" TOML_DLL_IMPORT Value * toml_new_bool(bool data);
     /// Create a new Value containing a datetime, you have ownership of the returned value.
     /// This function will fail and return nullptr if the data is not valid UTF-8.
     extern "C" TOML_DLL_IMPORT Value * toml_new_datetime(const Rust::Slice<const char> &data);

@@ -27,7 +27,7 @@ namespace TOML
     class Table;
     class Array;
 
-    class TomlError : std::exception
+    class TomlError : public std::exception
     {
     public:
         TomlError(const Rust::Slice<const char> &err)
@@ -115,6 +115,40 @@ namespace TOML
             auto value = FFI::toml_new_string({ str.data(), str.size() });
             if (!value)
                 throw TomlError(RUST_STR("Invalid string data"));
+            Value result;
+            result.value = value;
+            return std::move(result);
+        }
+
+        static Value Datetime(const std::string &str)
+        {
+            auto value = FFI::toml_new_datetime({ str.data(), str.size() });
+            if (!value)
+                throw TomlError(RUST_STR("Invalid string data"));
+            Value result;
+            result.value = value;
+            return std::move(result);
+        }
+
+        static Value I64(int64_t i)
+        {
+            auto value = FFI::toml_new_i64(i);
+            Value result;
+            result.value = value;
+            return std::move(result);
+        }
+
+        static Value F64(double f)
+        {
+            auto value = FFI::toml_new_f64(f);
+            Value result;
+            result.value = value;
+            return std::move(result);
+        }
+
+        static Value Bool(bool b)
+        {
+            auto value = FFI::toml_new_bool(b);
             Value result;
             result.value = value;
             return std::move(result);

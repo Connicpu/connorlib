@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Connor Hilarides <connorcpu@live.com>"]
 
 [lib]
-crate-type = ["dylib"]
+crate-type = ["dylib", "staticlib"]
 
 [dependencies]
 image = "0.10"
