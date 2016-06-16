@@ -17,6 +17,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 use std::{ptr, str};
+use std::collections::btree_map;
 use toml::{self, Value, Array, Table};
 
 // -----------------------------------------------------------------------------------------------
@@ -404,6 +405,36 @@ pub extern "C" fn toml_table_remove(table: *mut Table, key: &&[u8]) -> bool {
     table.remove(key).is_some()
 }
 
+pub struct TableIterator {
+    iter: btree_map::Iter<'static, String, Value>,
+}
+
+#[no_mangle]
+pub extern "C" fn toml_table_get_iterator(table: *const Table) -> *mut TableIterator {
+    // dear god this is horrifying :x but C++ has no concept of lifetimes
+    let table: &'static Table = unsafe { &*table };
+    let iter = TableIterator { iter: table.iter() };
+    Box::into_raw(Box::new(iter))
+}
+
+#[no_mangle]
+pub extern "C" fn toml_table_iterator_next(iter: *mut TableIterator, pkey: *mut &[u8], pvalue: *mut *const Value) -> bool {
+    let iter = unsafe { &mut (*iter).iter };
+    match iter.next() {
+        Some((key, value)) => unsafe {
+            *pkey = key.as_bytes();
+            *pvalue = value as *const _;
+            true
+        },
+        None => false
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn toml_table_iterator_free(iter: *mut TableIterator) {
+    unsafe { Box::from_raw(iter) };
+}
+
 // -----------------------------------------------------------------------------------------------
 // Serialization functions
 
@@ -443,3 +474,4 @@ pub extern "C" fn toml_serialize_text(data: &Value, output: *mut *mut Value) -> 
     unsafe { *output = Box::into_raw(Box::new(Value::String(result))) };
     true
 }
+

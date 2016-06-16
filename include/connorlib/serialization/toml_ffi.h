@@ -28,6 +28,7 @@ namespace FFI
     struct Value;
     struct Array;
     struct Table;
+    struct TableIterator;
 
     /// Free a value that you have ownership of
     extern "C" TOML_DLL_IMPORT void toml_free_value(Value *value);
@@ -143,6 +144,18 @@ namespace FFI
     extern "C" TOML_DLL_IMPORT bool toml_table_remove(
         Table *table,
         const Rust::Slice<const char> &key
+    );
+    /// Get an iterator over a table
+    extern "C" TOML_DLL_IMPORT TableIterator * toml_table_get_iterator(
+        const Table *table
+    );
+    extern "C" TOML_DLL_IMPORT bool toml_table_iterator_next(
+        TableIterator *iter,
+        Rust::Slice<const char> *key,
+        const Value **value
+    );
+    extern "C" TOML_DLL_IMPORT void toml_table_iterator_free(
+        TableIterator *iter
     );
     
     extern "C" TOML_DLL_IMPORT bool toml_parse_text(

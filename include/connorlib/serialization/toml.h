@@ -95,8 +95,12 @@ namespace TOML
 
         static Value Parse(const std::string &str)
         {
+        }
+
+        static Value Parse(const char *str, size_t len)
+        {
             FFI::Value *output;
-            if (!FFI::toml_parse_text({ str }, &output))
+            if (!FFI::toml_parse_text({ str, len }, &output))
             {
                 Rust::Slice<const char> error;
                 FFI::toml_get_string(output, &error);
@@ -187,20 +191,85 @@ namespace TOML
         bool IsArray() const { const FFI::Array *x; return FFI::toml_get_array(ptr(), &x); }
         bool IsTable() const { const FFI::Table *x; return FFI::toml_get_table(ptr(), &x); }
 
+        std::string GetString() const
+        {
+            assert(this);
+            Rust::Slice<const char> slice;
+            if (!FFI::toml_get_string(ptr(), &slice))
+                throw TomlError(RUST_STR("Value was not String"));
+            return std::string{ slice.data, slice.len };
+        }
+
         i64 GetI64() const
         {
+            assert(this);
             i64 value;
             if (!FFI::toml_get_i64(ptr(), &value))
                 throw TomlError(RUST_STR("Value was not i64"));
             return value;
         }
 
-        const Table *GetTable() const
+        f64 GetF64() const
         {
+            assert(this);
+            f64 value;
+            if (!FFI::toml_get_f64(ptr(), &value))
+                throw TomlError(RUST_STR("Value was not f64"));
+            return value;
+        }
+
+        std::string GetDatetime() const
+        {
+            assert(this);
+            Rust::Slice<const char> slice;
+            if (!FFI::toml_get_datetime(ptr(), &slice))
+                throw TomlError(RUST_STR("Value was not Datetime"));
+            return std::string{ slice.data, slice.len };
+        }
+
+        bool GetBool() const
+        {
+            assert(this);
+            bool value;
+            if (!FFI::toml_get_bool(ptr(), &value))
+                throw TomlError(RUST_STR("Value was not Bool"));
+            return value;
+        }
+
+        const Array &GetArray() const
+        {
+            assert(this);
+            const FFI::Array *array;
+            if (!FFI::toml_get_array(ptr(), &array))
+                throw TomlError(RUST_STR("Value was not Array"));
+            return *(const Array *)array;
+        }
+
+        Array &GetArray()
+        {
+            assert(this);
+            FFI::Array *array;
+            if (!FFI::toml_get_array_mut(ptr_mut(), &array))
+                throw TomlError(RUST_STR("Value was not Array"));
+            return *(Array *)array;
+        }
+
+        const Table &GetTable() const
+        {
+            assert(this);
             const FFI::Table *table;
             if (!FFI::toml_get_table(ptr(), &table))
-                return nullptr;
-            return (const Table *)table;
+                throw TomlError(RUST_STR("Value was not Table"));
+            return *(const Table *)table;
+        }
+
+        Table &GetTable()
+        {
+            assert(this);
+            FFI::Table *table;
+            if (!FFI::toml_get_table_mut(ptr_mut(), &table))
+                throw TomlError(RUST_STR("Value was not Table"));
+            return *(Table *)table;
         }
 
         std::string Serialize() const
@@ -223,13 +292,297 @@ namespace TOML
         TOML::FFI::Table *ptr_mut() { return (TOML::FFI::Table *)this; }
 
     public:
-        const ValueRef *Get(const std::string &key) const
+        class iterator
+        {
+        public:
+            using value_type = std::pair<std::string, const ValueRef *>;
+            using reference_type = const value_type &;
+            using pointer_type = const value_type *;
+
+            iterator() = default;
+
+            ~iterator()
+            {
+                if (iter)
+                    FFI::toml_table_iterator_free(iter);
+            }
+
+            iterator(const iterator &) = delete;
+            iterator(iterator &&move)
+                : iter(move.iter)
+            {
+                move.iter = nullptr;
+            }
+
+            iterator(const Table *table)
+            {
+                iter = FFI::toml_table_get_iterator((const FFI::Table *)table);
+                ++*this;
+            }
+
+            iterator &operator=(const iterator &) = delete;
+            iterator &operator=(iterator &&move)
+            {
+                iter = move.iter;
+                move.iter = nullptr;
+                return *this;
+            }
+
+            iterator &operator++()
+            {
+                assert(iter);
+
+                Rust::Slice<const char> key;
+                const FFI::Value *value;
+                if (FFI::toml_table_iterator_next(iter, &key, &value))
+                {
+                    current.first.assign(key.data, key.len);
+                    current.second = (const ValueRef *)value;
+                }
+                else
+                {
+                    iter = nullptr;
+                }
+
+                return *this;
+            }
+
+            reference_type operator*() const
+            {
+                return current;
+            }
+
+            pointer_type operator->() const
+            {
+                return &current;
+            }
+
+            bool operator!=(const iterator &rhs) const
+            {
+                return iter != rhs.iter;
+            }
+
+            bool operator==(const iterator &rhs) const
+            {
+                return iter == rhs.iter;
+            }
+
+        private:
+            FFI::TableIterator *iter;
+            value_type current;
+        };
+
+        const ValueRef *Get(const char *key, size_t len) const
         {
             const FFI::Value *val;
-            if (!FFI::toml_table_get(ptr(), key, &val))
+            if (!FFI::toml_table_get(ptr(), { key, len }, &val))
                 return nullptr;
 
             return (const ValueRef *)val;
+        }
+        ValueRef *Get(const char *key, size_t len)
+        {
+            FFI::Value *val;
+            if (!FFI::toml_table_get_mut(ptr_mut(), { key, len }, &val))
+                return nullptr;
+
+            return (ValueRef *)val;
+        }
+
+        const ValueRef *Get(const std::string &key) const
+        {
+            return Get(key.c_str(), key.size());
+        }
+        ValueRef *Get(const std::string &key)
+        {
+            return Get(key.c_str(), key.size());
+        }
+
+        template <size_t len>
+        const ValueRef *Get(const char(&key)[len]) const
+        {
+            return Get(key, len - 1);
+        }
+        template <size_t len>
+        ValueRef *Get(const char(&key)[len])
+        {
+            return Get(key, len - 1);
+        }
+
+        template <typename Arg>
+        const ValueRef *operator[](Arg &&arg) const
+        {
+            return Get(std::forward<Arg>(arg));
+        }
+
+        template <typename Arg>
+        ValueRef *operator[](Arg &&arg)
+        {
+            return Get(std::forward<Arg>(arg));
+        }
+
+        inline iterator begin() const
+        {
+            return iterator{ this };
+        }
+
+        inline iterator end() const
+        {
+            return iterator{};
+        }
+    };
+
+    class Array
+    {
+        const TOML::FFI::Array *ptr() const { return (const TOML::FFI::Array *)this; }
+        TOML::FFI::Array *ptr_mut() { return (TOML::FFI::Array *)this; }
+
+    public:
+        class const_iterator
+        {
+        public:
+            using self = const_iterator;
+            using owner = const Array *;
+            using owner_ffi = const FFI::Array *;
+            using value_type = ValueRef;
+            using reference_type = const value_type &;
+            using pointer_type = const value_type *;
+            using pointer_ffi = const FFI::Value *;
+
+            const_iterator(owner array, usize index)
+                : array(array), index(index)
+            {
+            }
+
+            self &operator++()
+            {
+                ++index;
+                return *this;
+            }
+
+            bool operator==(const self &rhs) const
+            {
+                return array == rhs.array && index == rhs.index;
+            }
+
+            bool operator!=(const self &rhs) const
+            {
+                return !(*this == rhs);
+            }
+
+            reference_type operator*() const
+            {
+                return *(operator->());
+            }
+
+            pointer_type operator->() const
+            {
+                pointer_ffi value;
+                FFI::toml_array_get((owner_ffi)array, index, &value);
+                return (pointer_type)value;
+            }
+
+        private:
+            owner array;
+            usize index;
+        };
+
+        class iterator
+        {
+        public:
+            using self = iterator;
+            using owner = Array *;
+            using owner_ffi = FFI::Array *;
+            using value_type = ValueRef;
+            using reference_type = value_type &;
+            using pointer_type = value_type *;
+            using pointer_ffi = FFI::Value *;
+
+            iterator(owner array, usize index)
+                : array(array), index(index)
+            {
+            }
+
+            self &operator++()
+            {
+                ++index;
+                return *this;
+            }
+
+            bool operator==(const self &rhs) const
+            {
+                return array == rhs.array && index == rhs.index;
+            }
+
+            bool operator!=(const self &rhs) const
+            {
+                return !(*this == rhs);
+            }
+
+            reference_type operator*() const
+            {
+                return *(operator->());
+            }
+
+            pointer_type operator->() const
+            {
+                pointer_ffi value;
+                FFI::toml_array_get_mut((owner_ffi)array, index, &value);
+                return (pointer_type)value;
+            }
+
+        private:
+            owner array;
+            usize index;
+        };
+
+        size_t GetLength() const
+        {
+            return FFI::toml_array_len(ptr());
+        }
+
+        const ValueRef *Get(size_t index) const
+        {
+            const FFI::Value *value;
+            if (!FFI::toml_array_get(ptr(), index, &value))
+                return nullptr;
+            return (const ValueRef *)value;
+        }
+        ValueRef *Get(size_t index)
+        {
+            const FFI::Value *value;
+            if (!FFI::toml_array_get(ptr(), index, &value))
+                return nullptr;
+            return (ValueRef *)value;
+        }
+
+        const ValueRef *operator[](size_t index) const
+        {
+            return Get(index);
+        }
+        ValueRef *operator[](size_t index)
+        {
+            return Get(index);
+        }
+
+        const_iterator begin() const
+        {
+            return const_iterator{ this, 0 };
+        }
+
+        const_iterator end() const
+        {
+            return const_iterator{ this, GetLength() };
+        }
+
+        iterator begin()
+        {
+            return iterator{ this, 0 };
+        }
+
+        iterator end()
+        {
+            return iterator{ this, GetLength() };
         }
     };
 }
