@@ -156,7 +156,7 @@ namespace ImageLoad
     {
     public:
         Frame()
-            : frame(frame)
+            : frame(nullptr)
         {
         }
 
@@ -366,6 +366,7 @@ namespace ImageLoad
 
             *frame = Frame{ pframe };
             *delay = std::chrono::milliseconds(uint32_t(udelay) * 10);
+            return true;
         }
 
         GifIter begin()
