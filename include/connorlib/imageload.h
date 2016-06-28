@@ -156,7 +156,7 @@ namespace ImageLoad
     {
     public:
         Frame()
-            : frame(frame)
+            : frame(nullptr)
         {
         }
 

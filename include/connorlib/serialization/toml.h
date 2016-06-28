@@ -95,6 +95,7 @@ namespace TOML
 
         static Value Parse(const std::string &str)
         {
+            return Parse(str.c_str(), str.size());
         }
 
         static Value Parse(const char *str, size_t len)
@@ -292,6 +293,9 @@ namespace TOML
         TOML::FFI::Table *ptr_mut() { return (TOML::FFI::Table *)this; }
 
     public:
+		Table(const Table &) = delete;
+		Table &operator=(const Table &) = delete;
+
         class iterator
         {
         public:

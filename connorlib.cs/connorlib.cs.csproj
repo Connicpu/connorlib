@@ -57,6 +57,7 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ImageLoad\FFI.cs" />
     <Compile Include="RustFFI.cs" />
     <Compile Include="Serialization\Toml\TomlFFI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
