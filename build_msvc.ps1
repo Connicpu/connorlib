@@ -12,23 +12,26 @@ Pop-Location
 ##################################
 # Ensure rust is updated
 
-rustup update stable-x86_64-pc-windows-msvc
-rustup update stable-i686-pc-windows-msvc
+$Rust64 = "nightly-x86_64-pc-windows-msvc"
+$Rust32 = "nightly-i686-pc-windows-msvc"
+
+rustup update $Rust64
+rustup update $Rust32
 
 ##################################
 # Build serialization library
 
 # x64
 Push-Location lib\serialization
-rustup run stable-x86_64-pc-windows-msvc cargo clean
-rustup run stable-x86_64-pc-windows-msvc cargo build --release
+rustup run $Rust64 cargo clean
+rustup run $Rust64 cargo build --release
 Pop-Location
 Copy-Item -Path ".\lib\serialization\target\release\serialization.*" -Destination "bin\x64"
 
 # x86
 Push-Location lib\serialization
-rustup run stable-i686-pc-windows-msvc cargo clean
-rustup run stable-i686-pc-windows-msvc cargo build --release
+rustup run $Rust32 cargo clean
+rustup run $Rust32 cargo build --release
 Pop-Location
 Copy-Item -Path ".\lib\serialization\target\release\serialization.*" -Destination "bin\x86"
 
@@ -37,15 +40,15 @@ Copy-Item -Path ".\lib\serialization\target\release\serialization.*" -Destinatio
 
 # x64
 Push-Location lib\imageload
-rustup run stable-x86_64-pc-windows-msvc cargo clean
-rustup run stable-x86_64-pc-windows-msvc cargo build --release
+rustup run $Rust64 cargo clean
+rustup run $Rust64 cargo build --release
 Pop-Location
 Copy-Item -Path ".\lib\imageload\target\release\imageload.*" -Destination "bin\x64"
 
 # x86
 Push-Location lib\imageload
-rustup run stable-i686-pc-windows-msvc cargo clean
-rustup run stable-i686-pc-windows-msvc cargo build --release
+rustup run $Rust32 cargo clean
+rustup run $Rust32 cargo build --release
 Pop-Location
 Copy-Item -Path ".\lib\imageload\target\release\imageload.*" -Destination "bin\x86"
 

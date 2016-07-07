@@ -4,9 +4,11 @@ version = "0.1.0"
 authors = ["Connor Hilarides <connorcpu@live.com>"]
 
 [lib]
-crate-type = ["dylib", "staticlib"]
+crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 toml = "0.1"
 rustc-serialize = "0.3.19"
 
+[profile.release]
+lto = true
