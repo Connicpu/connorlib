@@ -1,5 +1,5 @@
 [package]
-name = "imageload"
+name = "messageipc"
 version = "0.1.0"
 authors = ["Connor Hilarides <connorcpu@live.com>"]
 
@@ -7,10 +7,11 @@ authors = ["Connor Hilarides <connorcpu@live.com>"]
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-image = "0.10"
-gif = "0.8"
-owning_ref = "0.2"
-memmap = "0.3"
+libc = "0.2.15"
+byteorder = "0.5.3"
+
+[target."cfg(windows)".dependencies]
+named_pipe = "0.2.0"
 
 [profile.release]
 lto = true

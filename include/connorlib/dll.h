@@ -35,3 +35,9 @@
 #else
 #define IMG_DLL_IMPORT
 #endif
+
+#ifndef CONNORLIB_IPC_LINK_STATIC
+#define IPC_DLL_IMPORT DLL_IMPORT
+#else
+#define IPC_DLL_IMPORT
+#endif
