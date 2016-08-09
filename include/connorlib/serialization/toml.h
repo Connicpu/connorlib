@@ -20,6 +20,7 @@
 
 #include <connorlib/serialization/toml_ffi.h>
 
+namespace JSON { class Value; }
 namespace TOML
 {
     class Value;
@@ -46,6 +47,8 @@ namespace TOML
 
     class Value
     {
+        friend class Table;
+        friend class ValueRef;
         TOML::FFI::Value *value;
         
     public:
@@ -115,14 +118,19 @@ namespace TOML
             return result;
         }
 
-        static Value String(const std::string &str)
+        static Value String(const char *str, size_t len)
         {
-            auto value = FFI::toml_new_string({ str.data(), str.size() });
+            auto value = FFI::toml_new_string({ str, len });
             if (!value)
                 throw TomlError(RUST_STR("Invalid string data"));
             Value result;
             result.value = value;
             return std::move(result);
+        }
+
+        static Value String(const std::string &str)
+        {
+            return String(str.data(), str.size());
         }
 
         static Value Datetime(const std::string &str)
@@ -191,6 +199,14 @@ namespace TOML
         bool IsBool() const { bool x; return FFI::toml_get_bool(ptr(), &x); }
         bool IsArray() const { const FFI::Array *x; return FFI::toml_get_array(ptr(), &x); }
         bool IsTable() const { const FFI::Table *x; return FFI::toml_get_table(ptr(), &x); }
+
+        Value Clone() const
+        {
+            assert(this);
+            Value val;
+            val.value = FFI::toml_clone(ptr());
+            return std::move(val);
+        }
 
         std::string GetString() const
         {
@@ -285,6 +301,8 @@ namespace TOML
             FFI::toml_free_value(output);
             return std::move(text_str);
         }
+
+        inline JSON::Value ToJson() const;
     };
 
     class Table
@@ -423,6 +441,14 @@ namespace TOML
         ValueRef *operator[](Arg &&arg)
         {
             return Get(std::forward<Arg>(arg));
+        }
+
+        void Insert(const std::string &key, TOML::Value value)
+        {
+            auto val = value.value;
+            value.value = nullptr;
+
+            FFI::toml_table_insert(ptr_mut(), { key.data(), key.size() }, val);
         }
 
         inline iterator begin() const

@@ -18,32 +18,20 @@
 
 #pragma once
 
-#include <connorlib/dll.h>
-#include <connorlib/rustop.h>
+#include "json.h"
+#include "toml.h"
+#include "conversion_ffi.h"
 
-namespace JSON
+inline JSON::Value TOML::ValueRef::ToJson() const
 {
-    namespace FFI
-    {
-        class Value;
+    JSON::Value output;
+    Serialization::FFI::toml_to_json(ptr(), (JSON::FFI::Value **)&output);
+    return std::move(output);
+}
 
-        /// Free a value that you have ownership of
-        extern "C" TOML_DLL_IMPORT void json_free_value(Value *value);
-        /// Make a copy of a value so you can insert it into another structure
-        extern "C" TOML_DLL_IMPORT Value * json_clone(const Value *value);
-        
-        /// Get a slice containing the UTF-8 data of the string.
-        /// Returns false if the value is not a string.
-        extern "C" TOML_DLL_IMPORT bool json_get_string(const Value *value, Rust::Slice<const char> *data);
-
-        extern "C" TOML_DLL_IMPORT bool json_parse_text(
-            const Rust::Slice<const char> &data,
-            Value **output
-        );
-        
-        extern "C" TOML_DLL_IMPORT void json_serialize_text(
-            const Value *data,
-            Value **output
-        );
-    }
+inline TOML::Value JSON::ValueRef::ToToml() const
+{
+    TOML::Value output;
+    Serialization::FFI::json_to_toml(ptr(), (TOML::FFI::Value **)&output);
+    return std::move(output);
 }

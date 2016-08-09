@@ -21,3 +21,4 @@ extern crate rustc_serialize;
 
 pub mod conversion_api;
 pub mod toml_api;
+pub mod json_api;
