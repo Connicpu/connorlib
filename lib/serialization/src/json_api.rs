@@ -79,3 +79,10 @@ pub extern "C" fn json_serialize_text(data: &Value, output: *mut *mut Value) -> 
     true
 }
 
+#[no_mangle]
+pub extern "C" fn json_serialize_text_pretty(data: &Value, output: *mut *mut Value) -> bool {
+    let result = format!("{}", data.pretty());
+    unsafe { *output = Box::into_raw(Box::new(Value::String(result))) };
+    true
+}
+

@@ -45,5 +45,10 @@ namespace JSON
             const Value *data,
             Value **output
         );
+        
+        extern "C" TOML_DLL_IMPORT void json_serialize_text_pretty(
+            const Value *data,
+            Value **output
+        );
     }
 }
