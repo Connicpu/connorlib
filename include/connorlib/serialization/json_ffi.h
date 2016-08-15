@@ -25,7 +25,7 @@ namespace JSON
 {
     namespace FFI
     {
-        class Value;
+        struct Value;
 
         /// Free a value that you have ownership of
         extern "C" TOML_DLL_IMPORT void json_free_value(Value *value);
