@@ -91,7 +91,7 @@ namespace MessageIpc
     private:
         uint8_t *data_;
         size_t len_;
-    }
+    };
 
     class IpcClient
     {
@@ -133,6 +133,11 @@ namespace MessageIpc
             return std::nullopt;
         }
 
+        inline bool Send(const uint8_t *data, uint32_t len)
+        {
+            return FFI::mipc_send(client_, data, len) == FFI::MIPC_SUCCESS;
+        }
+
         inline std::optional<IpcMessage> Recv()
         {
             uint8_t *data;
@@ -152,11 +157,11 @@ namespace MessageIpc
             disconnected = false;
             switch (FFI::mipc_try_recv(client_, &data, &len))
             {
-                case MIPC_SUCCESS:
+                case FFI::MIPC_SUCCESS:
                     return IpcMessage(data, len);
-                case MIPC_EMPTY:
+                case FFI::MIPC_EMPTY:
                     return std::nullopt;
-                case MIPC_DISCONNECTED:
+                case FFI::MIPC_DISCONNECTED:
                     disconnected = true;
                     return std::nullopt;
                 default:
