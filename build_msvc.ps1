@@ -1,10 +1,15 @@
 # Setup output directory
-If (Test-Path "bin") {
+If (!(Test-Path "bin")) {
+    New-Item "bin" -ItemType Directory > $null
+}
+Push-Location "bin"
+
+if (Test-Path "windows") {
     Remove-Item -Recurse -Force "bin"
 }
 
-New-Item "bin" -ItemType Directory > $null
-Push-Location "bin"
+New-Item "windows" -ItemType Directory > $null
+Set-Location "windows"
 New-Item "x64" -ItemType Directory > $null
 New-Item "x86" -ItemType Directory > $null
 Pop-Location
@@ -26,14 +31,14 @@ Push-Location lib\serialization
 rustup run $Rust64 cargo clean
 rustup run $Rust64 cargo build --release
 Pop-Location
-Copy-Item -Path ".\lib\serialization\target\release\serialization.*" -Destination "bin\x64"
+Copy-Item -Path ".\lib\serialization\target\release\serialization.*" -Destination "bin\windows\x64"
 
 # x86
 Push-Location lib\serialization
 rustup run $Rust32 cargo clean
 rustup run $Rust32 cargo build --release
 Pop-Location
-Copy-Item -Path ".\lib\serialization\target\release\serialization.*" -Destination "bin\x86"
+Copy-Item -Path ".\lib\serialization\target\release\serialization.*" -Destination "bin\windows\x86"
 
 ##################################
 # Build imageload library
@@ -43,14 +48,14 @@ Push-Location lib\imageload
 rustup run $Rust64 cargo clean
 rustup run $Rust64 cargo build --release
 Pop-Location
-Copy-Item -Path ".\lib\imageload\target\release\imageload.*" -Destination "bin\x64"
+Copy-Item -Path ".\lib\imageload\target\release\imageload.*" -Destination "bin\windows\x64"
 
 # x86
 Push-Location lib\imageload
 rustup run $Rust32 cargo clean
 rustup run $Rust32 cargo build --release
 Pop-Location
-Copy-Item -Path ".\lib\imageload\target\release\imageload.*" -Destination "bin\x86"
+Copy-Item -Path ".\lib\imageload\target\release\imageload.*" -Destination "bin\windows\x86"
 
 ##################################
 # Build messageipc library
@@ -60,13 +65,13 @@ Push-Location lib\messageipc
 rustup run $Rust64 cargo clean
 rustup run $Rust64 cargo build --release
 Pop-Location
-Copy-Item -Path ".\lib\messageipc\target\release\messageipc.*" -Destination "bin\x64"
+Copy-Item -Path ".\lib\messageipc\target\release\messageipc.*" -Destination "bin\windows\x64"
 
 # x86
 Push-Location lib\messageipc
 rustup run $Rust32 cargo clean
 rustup run $Rust32 cargo build --release
 Pop-Location
-Copy-Item -Path ".\lib\messageipc\target\release\messageipc.*" -Destination "bin\x86"
+Copy-Item -Path ".\lib\messageipc\target\release\messageipc.*" -Destination "bin\windows\x86"
 
 powershell -File msvc_importlib.ps1

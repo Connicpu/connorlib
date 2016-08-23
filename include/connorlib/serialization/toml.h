@@ -36,7 +36,7 @@ namespace TOML
         {
         }
 
-        const char *what() const override
+        const char *what() const noexcept override
         {
             return error.c_str();
         }

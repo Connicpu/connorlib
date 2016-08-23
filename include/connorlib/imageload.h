@@ -239,6 +239,7 @@ namespace ImageLoad
         {
             img = move.img;
             move.img = nullptr;
+            return *this;
         }
 
         void GetSize(uint32_t *width, uint32_t *height)
@@ -350,6 +351,7 @@ namespace ImageLoad
         {
             state = move.state;
             move.state = nullptr;
+            return *this;
         }
 
         void GetSize(uint32_t *width, uint32_t *height)
@@ -396,3 +398,4 @@ namespace ImageLoad
         FFI::MultiImage *state;
     };
 }
+
